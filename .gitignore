@@ -22,3 +22,18 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 replay_pid*
+
+
+/web/node_modules
+/web/.env.local
+/web/.umirc.local.ts
+/web/config/config.local.ts
+/web/src/.umi
+/web/src/.umi-production
+/web/src/.umi-test
+/web/.umi
+/web/.umi-production
+/web/.umi-test
+/web/dist
+/web/.mfsu
+.swc
