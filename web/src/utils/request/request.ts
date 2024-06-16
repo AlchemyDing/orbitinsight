@@ -1,0 +1,97 @@
+import axios, { AxiosResponse } from 'axios'
+import type { AxiosInstance, InternalAxiosRequestConfig } from 'axios'
+import type {
+  RequestConfig,
+  RequestInterceptors,
+  CreateRequestConfig,
+} from './types'
+
+class Request {
+  // axios 实例
+  instance: AxiosInstance
+  // 拦截器对象
+  interceptorsObj?: RequestInterceptors<AxiosResponse>
+  // * 存放取消请求控制器Map
+  abortControllerMap: Map<string, AbortController>
+
+  constructor(config: CreateRequestConfig) {
+    this.instance = axios.create(config)
+    // * 初始化存放取消请求控制器Map
+    this.abortControllerMap = new Map()
+    this.interceptorsObj = config.interceptors
+    this.instance.interceptors.request.use(
+      (res: InternalAxiosRequestConfig) => {
+        const controller = new AbortController()
+        const url = res.url || ''
+        res.signal = controller.signal
+        this.abortControllerMap.set(url, controller)
+        return res
+      },
+      (err: any) => err,
+    )
+
+    // 使用实例拦截器
+    this.instance.interceptors.request.use(
+      this.interceptorsObj?.requestInterceptors,
+      this.interceptorsObj?.requestInterceptorsCatch,
+    )
+    this.instance.interceptors.response.use(
+      this.interceptorsObj?.responseInterceptors,
+      this.interceptorsObj?.responseInterceptorsCatch,
+    )
+
+    this.instance.interceptors.response.use(
+      // TODO 处理后端特定的返回数据
+      (res: AxiosResponse) => {
+        const url = res.config.url || ''
+        this.abortControllerMap.delete(url)
+        return res.data
+      },
+      (err: any) => err,
+    )
+  }
+  request<T>(config: RequestConfig<T>): Promise<T> {
+    return new Promise((resolve, reject) => {
+      // 使用单个请求的拦截器
+      if (config.interceptors?.requestInterceptors) {
+        config = config.interceptors.requestInterceptors(config as any)
+      }
+      this.instance
+        .request<any, T>(config)
+        .then(res => {
+          // 单个响应的拦截器
+          if (config.interceptors?.responseInterceptors) {
+            res = config.interceptors.responseInterceptors(res)
+          }
+
+          resolve(res)
+        })
+        .catch((err: any) => {
+          reject(err)
+        })
+    })
+  }
+  /**
+   * 取消全部请求
+   */
+  cancelAllRequest() {
+    for (const [, controller] of this.abortControllerMap) {
+      controller.abort()
+    }
+    this.abortControllerMap.clear()
+  }
+  /**
+   * 取消指定的请求
+   * @param url 待取消的请求URL
+   */
+  cancelRequest(url: string | string[]) {
+    const urlList = Array.isArray(url) ? url : [url]
+    for (const _url of urlList) {
+      this.abortControllerMap.get(_url)?.abort()
+      this.abortControllerMap.delete(_url)
+    }
+  }
+}
+
+export default Request
+export { RequestConfig, RequestInterceptors }

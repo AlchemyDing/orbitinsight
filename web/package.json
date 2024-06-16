@@ -2,28 +2,31 @@
   "private": true,
   "author": "",
   "scripts": {
-    "dev": "max dev",
-    "build": "max build",
-    "format": "prettier --cache --write .",
-    "prepare": "husky",
-    "postinstall": "max setup",
-    "setup": "max setup",
-    "start": "npm run dev"
+    "dev": "umi dev",
+    "build": "umi build",
+    "postinstall": "umi setup",
+    "setup": "umi setup",
+    "start": "cross-env REACT_APP_ENV=dev npm run dev",
+    "start:dev": "cross-env REACT_APP_ENV=dev npm run dev",
+    "start:test": "cross-env REACT_APP_ENV=test npm run dev",
+    "start:prod": "cross-env REACT_APP_ENV=prod npm run dev"
   },
   "dependencies": {
-    "@ant-design/icons": "^5.0.1",
+    "@ant-design/icons": "^5.3.7",
     "@ant-design/pro-components": "^2.7.10",
-    "@umijs/max": "^4.2.11",
-    "antd": "^5.4.0"
+    "@ant-design/pro-layout": "^7.19.8",
+    "@emotion/css": "^11.11.2",
+    "@emotion/react": "^11.11.4",
+    "@types/node": "^20.14.2",
+    "antd": "^5.18.1",
+    "axios": "^1.7.2",
+    "cross-env": "^7.0.3",
+    "umi": "^4.2.11"
   },
   "devDependencies": {
     "@types/react": "^18.0.33",
     "@types/react-dom": "^18.0.11",
-    "husky": "^9",
-    "lint-staged": "^13.2.0",
-    "prettier": "^2.8.7",
-    "prettier-plugin-organize-imports": "^3.2.2",
-    "prettier-plugin-packagejson": "^2.4.3",
+    "@umijs/plugins": "^4.2.11",
     "typescript": "^5.0.3"
   }
 }
