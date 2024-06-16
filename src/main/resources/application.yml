@@ -1,0 +1,11 @@
+orbit-insight:
+  consumer:
+    kafka:
+      logs:
+        topic: "logs"
+        group-id: "logs-group"
+        bootstrap-servers: "localhost:9092"
+        consumer-properties:
+          key.deserializer: "org.apache.kafka.common.serialization.StringDeserializer"
+          value.deserializer: "org.apache.kafka.common.serialization.ByteArrayDeserializer"
+          max.poll.records: "1000"
