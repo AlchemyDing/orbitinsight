@@ -1,11 +1,13 @@
 package com.orbitinsight;
 
+import com.orbitinsight.core.EncodingType;
+import com.orbitinsight.core.OrbitInsightProperties;
 import com.orbitinsight.core.SourceInfo;
 import com.orbitinsight.core.SourceType;
-import com.orbitinsight.core.bean.KafkaConsumerBean;
-import com.orbitinsight.handler.LogsHandler;
-import com.orbitinsight.core.OrbitInsightProperties;
 import com.orbitinsight.core.bean.BeanCreator;
+import com.orbitinsight.core.bean.KafkaConsumerBean;
+import com.orbitinsight.pipeline.ProtoKafkaLogsSource;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -20,22 +22,22 @@ import java.util.stream.Collectors;
 @Component
 public class OrbitInsightRunner implements CommandLineRunner {
 
-//    @Autowired
-//    private OrbitInsightProperties orbitInsightProperties;
-//
-//    @Autowired
-//    private LogsHandler logsHandler;
+    @Autowired
+    private OrbitInsightProperties orbitInsightProperties;
+
+    @Autowired
+    private ProtoKafkaLogsSource protoKafkaLogsSource;
 
     @Override
     public void run(String... args) throws Exception {
-//        // 初始化kafka
-//        List< SourceInfo> logs = orbitInsightProperties.getLogs();
-//        Map<SourceType, List<SourceInfo>> sourceMap = logs.stream().collect(Collectors.groupingBy(SourceInfo::getSourceType));
-//        List<SourceInfo> kafkaSources = sourceMap.get(SourceType.KAFKA);
-//        for (SourceInfo kafkaSourceInfo : kafkaSources) {
-//            KafkaConsumerBean consumerBean = (KafkaConsumerBean)BeanCreator.createBean(new KafkaConsumerBean<>(kafkaSourceInfo.getName(), kafkaSourceInfo.getProperties(), kafkaSourceInfo.getTopics(), 1, logsHandler));
-//            consumerBean.start();
-//        }
-
+        List<SourceInfo> logs = orbitInsightProperties.getLogs();
+        Map<SourceType, List<SourceInfo>> sourceMap = logs.stream().filter(sourceInfo -> sourceInfo.getEncoding().equals(EncodingType.OTLP_PROTO)).collect(Collectors.groupingBy(SourceInfo::getSourceType));
+        List<SourceInfo> kafkaSources = sourceMap.get(SourceType.KAFKA);
+        if (CollectionUtils.isNotEmpty(kafkaSources)) {
+            for (SourceInfo kafkaSource : kafkaSources) {
+                KafkaConsumerBean<String, byte[]> consumerBean = (KafkaConsumerBean<String, byte[]>) BeanCreator.createBean(new KafkaConsumerBean<>(kafkaSource.getName(), kafkaSource.getProperties(), kafkaSource.getTopics(), kafkaSource.getParallel(), protoKafkaLogsSource));
+                consumerBean.start();
+            }
+        }
     }
 }

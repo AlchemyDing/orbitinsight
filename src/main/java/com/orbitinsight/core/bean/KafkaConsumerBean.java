@@ -1,7 +1,7 @@
 package com.orbitinsight.core.bean;
 
 import com.alibaba.fastjson2.JSON;
-import com.orbitinsight.handler.SignalHandler;
+import com.orbitinsight.core.pipeline.Component;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.IterableUtils;
@@ -23,16 +23,16 @@ public class KafkaConsumerBean<K, V> extends AbstractManualBean {
     private final KafkaConsumer<K, V> consumer;
     private final List<String> topics;
     private final Integer parallel;
-    private final SignalHandler handler;
+    private final Component component;
 
     private final AtomicBoolean closed = new AtomicBoolean(false);
 
-    public KafkaConsumerBean(String beanName, Properties properties, List<String> topics, Integer parallel, SignalHandler handler) {
+    public KafkaConsumerBean(String beanName, Properties properties, List<String> topics, Integer parallel,Component component) {
         super(beanName);
         this.consumer = new KafkaConsumer<>(properties);
         this.topics = topics;
         this.parallel = Objects.requireNonNullElse(parallel, 1);
-        this.handler = handler;
+        this.component = component;
     }
 
     public void start() {
@@ -58,7 +58,7 @@ public class KafkaConsumerBean<K, V> extends AbstractManualBean {
                         continue;
                     }
                     try {
-                        handler.handle(records);
+                        component.execute(records);
                         ack(records);
                     } catch (Exception e) {
                         log.warn("Handling error, error times:{}, message:{}", errorTimes, e.getMessage());

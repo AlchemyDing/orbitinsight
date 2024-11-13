@@ -15,7 +15,7 @@ public abstract class AbstractComponent<T, R> implements Component<T>{
     public void execute(T o) {
         // 当前组件执行
         R r = doExecute(o);
-        System.out.println(getName() + " receive " + o + " return " + r);
+//        System.out.println(getName() + " receive " + o + " return " + r);
         // 获取下游组件，并执行
         Collection<Component> downStreams = getDownStreams();
         if (!CollectionUtils.isEmpty(downStreams)) {

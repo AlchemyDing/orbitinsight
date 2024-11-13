@@ -6,10 +6,8 @@ package com.orbitinsight.core.pipeline;
 public interface LifeCycle {
     /**
      * 初始化
-     *
-     * @param config
      */
-    default void init(String config) {
+    default void init() {
     }
 
     /**
