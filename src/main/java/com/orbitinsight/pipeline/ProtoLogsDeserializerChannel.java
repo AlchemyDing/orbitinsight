@@ -6,10 +6,13 @@ import com.orbitinsight.core.pipeline.Component;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * @author dingjiefei
+ */
 @org.springframework.stereotype.Component
-public class ProtoLogsDeserializerChannel extends Channel<byte[],Object> {
+public class ProtoLogsDeserializerChannel extends Channel<List<byte[]>,Object> {
     @Override
-    protected Object doExecute(byte[] o) {
+    protected Object doExecute(List<byte[]> list) {
         return null;
     }
 
