@@ -37,3 +37,4 @@ replay_pid*
 /web/dist
 /web/.mfsu
 .swc
+/target/
