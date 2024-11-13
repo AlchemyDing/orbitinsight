@@ -1,11 +1,20 @@
 orbit-insight:
-  consumer:
-    kafka:
-      logs:
-        topic: "logs"
-        group-id: "logs-group"
-        bootstrap-servers: "localhost:9092"
-        consumer-properties:
-          key.deserializer: "org.apache.kafka.common.serialization.StringDeserializer"
-          value.deserializer: "org.apache.kafka.common.serialization.ByteArrayDeserializer"
-          max.poll.records: "1000"
+  logs:
+    - source_type: kafka
+      name: logsKafkaSource
+      encoding: otlp_proto
+      parallel: 1
+      topics:
+        - otlp_logs
+      properties:
+        bootstrap.servers: alikafka-pre-cn-tl32qbo80005-1-vpc.alikafka.aliyuncs.com:9092,alikafka-pre-cn-tl32qbo80005-2-vpc.alikafka.aliyuncs.com:9092,alikafka-pre-cn-tl32qbo80005-3-vpc.alikafka.aliyuncs.com:9092
+        group.id: sale_local
+        key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
+        value.deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
+
+
+spring:
+  application:
+    name: orbit-insight
+logging:
+  config: classpath:logback-spring.xml

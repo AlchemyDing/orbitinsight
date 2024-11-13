@@ -1,4 +1,4 @@
-package com.orbitinsight.core;
+package com.orbitinsight.core.bean;
 
 
 import org.springframework.beans.factory.support.*;
