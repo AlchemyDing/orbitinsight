@@ -35,6 +35,6 @@ public abstract class AbstractComponent<T, R> implements Component<T> {
      * @param o 传入的数据
      * @return
      */
-    protected abstract R doExecute(T o) throws InvalidProtocolBufferException;
+    protected abstract R doExecute(T o) throws Exception;
 
 }
