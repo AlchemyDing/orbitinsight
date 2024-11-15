@@ -1,7 +1,7 @@
 package com.orbitinsight.core.pipeline;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.kafka.shaded.com.google.protobuf.InvalidProtocolBufferException;
 
 import java.util.Collection;
 
@@ -12,6 +12,7 @@ import java.util.Collection;
  * @param <R> 输出
  * @author dingjiefei
  */
+@Slf4j
 public abstract class AbstractComponent<T, R> implements Component<T> {
 
     @Override
@@ -25,7 +26,7 @@ public abstract class AbstractComponent<T, R> implements Component<T> {
                 downStreams.forEach(c -> c.execute(r));
             }
         } catch (Exception e) {
-
+            log.warn("pipeline running error:{}", e, e.getMessage());
         }
     }
 

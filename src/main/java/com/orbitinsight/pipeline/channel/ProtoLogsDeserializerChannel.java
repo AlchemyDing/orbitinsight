@@ -1,16 +1,18 @@
-package com.orbitinsight.pipeline;
+package com.orbitinsight.pipeline.channel;
 
 import com.alibaba.fastjson2.JSONObject;
+import com.google.common.collect.Lists;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.orbitinsight.cache.CachePool;
-import com.orbitinsight.model.LogInfo;
 import com.orbitinsight.core.pipeline.Channel;
+import com.orbitinsight.model.LogInfo;
 import com.orbitinsight.utils.OtlpUtil;
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest;
 import io.opentelemetry.proto.logs.v1.LogRecord;
 import io.opentelemetry.proto.logs.v1.ResourceLogs;
 import io.opentelemetry.proto.logs.v1.ScopeLogs;
 import io.opentelemetry.proto.resource.v1.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -21,10 +23,13 @@ import java.util.List;
  * @author dingjiefei
  */
 @Component
-public class ProtoLogsDeserializerChannel extends Channel<List<byte[]>, Object> {
+public class ProtoLogsDeserializerChannel extends Channel<List<byte[]>, List<LogInfo>> {
+
+    @Autowired
+    private LogsFliterChannel logsFliterChannel;
 
     @Override
-    protected Object doExecute(List<byte[]> list) throws InvalidProtocolBufferException {
+    protected List<LogInfo> doExecute(List<byte[]> list) throws InvalidProtocolBufferException {
         List<LogInfo> logInfos = new ArrayList<>();
         for (byte[] bytes : list) {
             ExportLogsServiceRequest request = ExportLogsServiceRequest.parseFrom(bytes);
@@ -77,6 +82,6 @@ public class ProtoLogsDeserializerChannel extends Channel<List<byte[]>, Object> 
 
     @Override
     public Collection<com.orbitinsight.core.pipeline.Component> getDownStreams() {
-        return List.of();
+        return Lists.newArrayList(logsFliterChannel);
     }
 }
