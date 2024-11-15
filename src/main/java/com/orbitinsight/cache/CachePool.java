@@ -16,6 +16,6 @@ public class CachePool {
     }
 
     public static final Cache<Resource, JSONObject> RESOURCE_CACHE = Caffeine.newBuilder()
-            .maximumSize(10000)
+            .maximumSize(4000)
             .expireAfterAccess(10, TimeUnit.SECONDS).build();
 }

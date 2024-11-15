@@ -32,7 +32,6 @@ public class ProtoLogsDeserializerChannel extends Channel<List<byte[]>, Object> 
             for (ResourceLogs resourceLogs : resourceLogsList) {
                 Resource resource = resourceLogs.getResource();
                 JSONObject resourceAttributes = CachePool.RESOURCE_CACHE.get(resource, r -> OtlpUtil.convertAttributesToJson(r.getAttributesList()));
-                System.out.println(CachePool.RESOURCE_CACHE.estimatedSize());
                 for (ScopeLogs scopeLogs : resourceLogs.getScopeLogsList()) {
                     JSONObject scopeAttribute = OtlpUtil.convertAttributesToJson(scopeLogs.getScope().getAttributesList());
                     for (LogRecord logRecord : scopeLogs.getLogRecordsList()) {
