@@ -12,8 +12,8 @@ import java.util.List;
  */
 @Data
 @Configuration
-@ConfigurationProperties(prefix = "orbit-insight")
-public class OrbitInsightProperties implements Serializable {
+@ConfigurationProperties(prefix = "orbit-insight.source")
+public class OrbitInsightSourceProperties implements Serializable {
     private List<SourceInfo> logs;
     private List<SourceInfo> traces;
     private List<SourceInfo> metrics;

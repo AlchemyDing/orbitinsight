@@ -1,7 +1,7 @@
 package com.orbitinsight;
 
 import com.orbitinsight.core.EncodingType;
-import com.orbitinsight.core.OrbitInsightProperties;
+import com.orbitinsight.core.OrbitInsightSourceProperties;
 import com.orbitinsight.core.SourceInfo;
 import com.orbitinsight.core.SourceType;
 import com.orbitinsight.core.bean.BeanCreator;
@@ -23,14 +23,14 @@ import java.util.stream.Collectors;
 public class OrbitInsightRunner implements CommandLineRunner {
 
     @Autowired
-    private OrbitInsightProperties orbitInsightProperties;
+    private OrbitInsightSourceProperties orbitInsightSourceProperties;
 
     @Autowired
     private ProtoKafkaLogsSource protoKafkaLogsSource;
 
     @Override
     public void run(String... args) throws Exception {
-        List<SourceInfo> logs = orbitInsightProperties.getLogs();
+        List<SourceInfo> logs = orbitInsightSourceProperties.getLogs();
         Map<SourceType, List<SourceInfo>> sourceMap = logs.stream().filter(sourceInfo -> sourceInfo.getEncoding().equals(EncodingType.OTLP_PROTO)).collect(Collectors.groupingBy(SourceInfo::getSourceType));
         List<SourceInfo> kafkaSources = sourceMap.get(SourceType.KAFKA);
         if (CollectionUtils.isNotEmpty(kafkaSources)) {
