@@ -1,4 +1,4 @@
-package com.orbitinsight.pipeline;
+package com.orbitinsight.pipeline.source;
 
 import com.google.common.collect.Lists;
 import com.orbitinsight.core.pipeline.Component;
@@ -32,7 +32,7 @@ public class ProtoKafkaLogsSource extends Source<ConsumerRecords<String, byte[]>
 
     @Override
     public String getName() {
-        return getClass().getName();
+        return getClass().getSimpleName();
     }
 
     @Override

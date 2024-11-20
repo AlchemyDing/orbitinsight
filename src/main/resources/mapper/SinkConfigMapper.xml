@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.orbitinsight.mapper.SourceConfigMapper">
-    <select id="queryAll" resultType="com.orbitinsight.domain.SourceConfig">
+<mapper namespace="com.orbitinsight.mapper.SinkConfigMapper">
+    <select id="queryAll" resultType="com.orbitinsight.domain.SinkConfig">
         select *
-        from `orbit_insight`.`t_source_config`
+        from `orbit_insight`.`t_sink_config`
         where is_deleted = 0
     </select>
 </mapper>

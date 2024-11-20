@@ -49,12 +49,19 @@ public class OtlpUtil {
         }
     }
 
+    private static final char[] HEX_CHARS = "0123456789abcdef".toCharArray();
+
     public static String byteStringToHex(ByteString byteString) {
+        long now = System.nanoTime();
+
         byte[] bytes = byteString.toByteArray();
-        StringBuilder hexString = new StringBuilder();
+        StringBuilder hexString = new StringBuilder(bytes.length * 2);
         for (byte b : bytes) {
-            hexString.append(String.format("%02x", b));
+            hexString.append(HEX_CHARS[(b & 0xFF) >> 4]);
+            hexString.append(HEX_CHARS[b & 0x0F]);
         }
+        System.out.println("byteStringToHex cost: " + (System.nanoTime() - now));
+
         return hexString.toString();
     }
 }
