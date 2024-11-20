@@ -3,11 +3,11 @@ package com.orbitinsight.core;
 /**
  * @author dingjiefei
  */
-public enum SourceType {
-    KAFKA(1),
+public enum SignalType {
+    LOGS(1),
     ;
 
-    SourceType(Integer type) {
+    SignalType(Integer type) {
         this.type = type;
     }
 

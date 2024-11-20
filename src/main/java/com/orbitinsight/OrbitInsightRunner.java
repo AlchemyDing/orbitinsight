@@ -2,6 +2,8 @@ package com.orbitinsight;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
+import com.orbitinsight.core.SignalType;
+import com.orbitinsight.core.SourceType;
 import com.orbitinsight.core.bean.BeanCreator;
 import com.orbitinsight.core.bean.KafkaConsumerBean;
 import com.orbitinsight.domain.SourceConfig;
@@ -32,9 +34,9 @@ public class OrbitInsightRunner implements CommandLineRunner {
         for (SourceConfig config : list) {
             Integer signalType = config.getSignalType();
             Integer type = config.getType();
-            if (signalType == 1) {
+            if (SignalType.LOGS.getType().equals(signalType)) {
                 // logs
-                if (type == 1) {
+                if (SourceType.KAFKA.getType().equals(type)) {
                     //kafka
                     JSONObject jsonObject = JSON.parseObject(config.getProperties());
                     Properties properties = new Properties();
