@@ -15,8 +15,7 @@ public class LogsFliterChannel extends Channel<List<LogInfo>, List<LogInfo>> {
     @Override
     protected List<LogInfo> doExecute(List<LogInfo> list) throws Exception {
 
-
-        return List.of();
+        return list;
     }
 
     @Override

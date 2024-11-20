@@ -1,20 +1,18 @@
 package com.orbitinsight;
 
-import com.orbitinsight.core.EncodingType;
-import com.orbitinsight.core.OrbitInsightSourceProperties;
-import com.orbitinsight.core.SourceInfo;
-import com.orbitinsight.core.SourceType;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import com.orbitinsight.core.bean.BeanCreator;
 import com.orbitinsight.core.bean.KafkaConsumerBean;
+import com.orbitinsight.domain.SourceConfig;
+import com.orbitinsight.mapper.SourceConfigMapper;
 import com.orbitinsight.pipeline.ProtoKafkaLogsSource;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Properties;
 
 /**
  * @author dingjiefei
@@ -23,20 +21,31 @@ import java.util.stream.Collectors;
 public class OrbitInsightRunner implements CommandLineRunner {
 
     @Autowired
-    private OrbitInsightSourceProperties orbitInsightSourceProperties;
+    private ProtoKafkaLogsSource protoKafkaLogsSource;
 
     @Autowired
-    private ProtoKafkaLogsSource protoKafkaLogsSource;
+    private SourceConfigMapper sourceConfigMapper;
 
     @Override
     public void run(String... args) throws Exception {
-        List<SourceInfo> logs = orbitInsightSourceProperties.getLogs();
-        Map<SourceType, List<SourceInfo>> sourceMap = logs.stream().filter(sourceInfo -> sourceInfo.getEncoding().equals(EncodingType.OTLP_PROTO)).collect(Collectors.groupingBy(SourceInfo::getSourceType));
-        List<SourceInfo> kafkaSources = sourceMap.get(SourceType.KAFKA);
-        if (CollectionUtils.isNotEmpty(kafkaSources)) {
-            for (SourceInfo kafkaSource : kafkaSources) {
-                KafkaConsumerBean<String, byte[]> consumerBean = (KafkaConsumerBean<String, byte[]>) BeanCreator.createBean(new KafkaConsumerBean<>(kafkaSource.getName(), kafkaSource.getProperties(), kafkaSource.getTopics(), kafkaSource.getParallel(), protoKafkaLogsSource));
-                consumerBean.start();
+        List<SourceConfig> list = sourceConfigMapper.queryAll();
+        for (SourceConfig config : list) {
+            Integer signalType = config.getSignalType();
+            Integer type = config.getType();
+            if (signalType == 1) {
+                // logs
+                if (type == 1) {
+                    //kafka
+                    JSONObject jsonObject = JSON.parseObject(config.getProperties());
+                    Properties properties = new Properties();
+                    properties.putAll(jsonObject.getJSONObject("properties"));
+                    properties.putIfAbsent("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+                    properties.putIfAbsent("value.deserializer", "org.apache.kafka.common.serialization.ByteArrayDeserializer");
+                    Integer parallel = jsonObject.getInteger("parallel");
+                    List<String> topics = jsonObject.getList("topics", String.class);
+                    KafkaConsumerBean<String, byte[]> consumerBean = (KafkaConsumerBean<String, byte[]>) BeanCreator.createBean(new KafkaConsumerBean<>(config.getName(), properties, topics, parallel, protoKafkaLogsSource));
+                    consumerBean.start();
+                }
             }
         }
     }

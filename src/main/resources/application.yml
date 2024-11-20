@@ -12,10 +12,24 @@ orbit-insight:
           group.id: sale_local
           key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
           value.deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
-
-
 spring:
   application:
     name: orbit-insight
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    driver-class-name: org.apache.arrow.driver.jdbc.ArrowFlightJdbcDriver
+    username: root
+    password: 123456
+    url: jdbc:arrow-flight-sql://10.8.62.131:9031?useServerPrepStmts=false&cachePrepStmts=true&useSSL=false&useEncryption=false
+  data:
+    jdbc:
+      repositories:
+        enabled: false
 logging:
   config: classpath:logback-spring.xml
+mybatis:
+  mapper-locations: classpath*:mapper/**/*.xml
+  type-aliases-package: com.orbitinsight.domain
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
