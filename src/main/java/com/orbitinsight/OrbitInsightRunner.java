@@ -2,8 +2,8 @@ package com.orbitinsight;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
-import com.orbitinsight.core.SignalType;
-import com.orbitinsight.core.SourceType;
+import com.orbitinsight.model.SignalType;
+import com.orbitinsight.model.SourceType;
 import com.orbitinsight.core.bean.BeanCreator;
 import com.orbitinsight.core.bean.KafkaConsumerBean;
 import com.orbitinsight.domain.SourceConfig;

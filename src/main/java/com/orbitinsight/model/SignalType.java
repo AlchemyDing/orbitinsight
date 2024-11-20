@@ -1,4 +1,4 @@
-package com.orbitinsight.core;
+package com.orbitinsight.model;
 
 /**
  * @author dingjiefei
