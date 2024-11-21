@@ -1,6 +1,6 @@
 package com.orbitinsight.core.bean;
 
-import com.orbitinsight.utils.ManualBeanUtil;
+import com.orbitinsight.utils.CacheUtil;
 import com.orbitinsight.utils.UnsafeUtil;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -31,12 +31,13 @@ public class KafkaProducerBean<K, V> extends AbstractManualBean {
 
     @Override
     public void destroy() throws Exception {
+        CacheUtil.removeKafkaProducerBean(beanName);
         producer.flush();
         producer.close();
     }
 
     public void init() {
-        ManualBeanUtil.putKafkaProducerBean(beanName, this);
+        CacheUtil.putKafkaProducerBean(beanName, this);
         Field field = null;
         try {
             field = KafkaProducer.class.getDeclaredField("sender");

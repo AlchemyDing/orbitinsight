@@ -13,6 +13,7 @@ public class SinkFeature implements Serializable {
     private Long id;
     private String sinkName;
     private String feature;
+    private Integer priority;
     private String createAccount;
     private Date createTime;
     private String modifyAccount;

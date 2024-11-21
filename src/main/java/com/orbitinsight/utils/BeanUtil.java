@@ -1,6 +1,7 @@
-package com.orbitinsight.core.bean;
+package com.orbitinsight.utils;
 
 
+import com.orbitinsight.core.bean.ManualBean;
 import org.springframework.beans.factory.support.*;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.stereotype.Component;
@@ -9,11 +10,11 @@ import org.springframework.stereotype.Component;
  * @author dingjiefei
  */
 @Component
-public class BeanCreator {
+public class BeanUtil {
 
     private static ConfigurableApplicationContext applicationContext;
 
-    public BeanCreator(ConfigurableApplicationContext applicationContext) {
+    public BeanUtil(ConfigurableApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
     }
 
@@ -36,5 +37,10 @@ public class BeanCreator {
         });
         beanFactory.registerBeanDefinition(bean.beanName(), beanDefinition);
         return beanFactory.getBean(bean.beanName());
+    }
+
+    public static void destroyBean(String beanName) {
+        DefaultListableBeanFactory beanFactory = (DefaultListableBeanFactory) applicationContext.getBeanFactory();
+        beanFactory.destroyBean(beanName);
     }
 }

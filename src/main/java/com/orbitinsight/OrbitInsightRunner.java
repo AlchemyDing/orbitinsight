@@ -2,17 +2,20 @@ package com.orbitinsight;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
-import com.orbitinsight.core.bean.BeanCreator;
 import com.orbitinsight.core.bean.KafkaConsumerBean;
 import com.orbitinsight.core.bean.KafkaProducerBean;
 import com.orbitinsight.domain.SinkConfig;
+import com.orbitinsight.domain.SinkFeature;
 import com.orbitinsight.domain.SourceConfig;
 import com.orbitinsight.mapper.SinkConfigMapper;
+import com.orbitinsight.mapper.SinkFeatureMapper;
 import com.orbitinsight.mapper.SourceConfigMapper;
 import com.orbitinsight.model.SignalType;
 import com.orbitinsight.model.SinkType;
 import com.orbitinsight.model.SourceType;
 import com.orbitinsight.pipeline.source.ProtoKafkaLogsSource;
+import com.orbitinsight.utils.BeanUtil;
+import com.orbitinsight.utils.CacheUtil;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.ByteArrayDeserializer;
@@ -40,10 +43,19 @@ public class OrbitInsightRunner implements CommandLineRunner {
     @Autowired
     private SinkConfigMapper sinkConfigMapper;
 
+    @Autowired
+    private SinkFeatureMapper sinkFeatureMapper;
+
     @Override
     public void run(String... args) throws Exception {
+        initSinkFeature();
         createSink();
         createSource();
+    }
+
+    private void initSinkFeature() {
+        List<SinkFeature> sinkFeatures = sinkFeatureMapper.queryAll();
+        CacheUtil.addSinkFeature(sinkFeatures);
     }
 
     private void createSink() {
@@ -70,7 +82,7 @@ public class OrbitInsightRunner implements CommandLineRunner {
                     properties.putIfAbsent(ProducerConfig.COMPRESSION_TYPE_CONFIG, "gzip");
                     // enable.idempotence：幂等性
                     properties.putIfAbsent(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, false);
-                    KafkaProducerBean<String, String> producerBean = (KafkaProducerBean<String, String>) BeanCreator.createBean(new KafkaProducerBean<>(config.getName(), properties));
+                    KafkaProducerBean<String, String> producerBean = (KafkaProducerBean<String, String>) BeanUtil.createBean(new KafkaProducerBean<>(config.getName(), properties));
                     producerBean.init();
                 }
             }
@@ -93,7 +105,7 @@ public class OrbitInsightRunner implements CommandLineRunner {
                     properties.putIfAbsent(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ByteArrayDeserializer.class.getName());
                     Integer parallel = jsonObject.getInteger("parallel");
                     List<String> topics = jsonObject.getList("topics", String.class);
-                    KafkaConsumerBean<String, byte[]> consumerBean = (KafkaConsumerBean<String, byte[]>) BeanCreator.createBean(new KafkaConsumerBean<>(config.getName(), properties, topics, parallel, protoKafkaLogsSource));
+                    KafkaConsumerBean<String, byte[]> consumerBean = (KafkaConsumerBean<String, byte[]>) BeanUtil.createBean(new KafkaConsumerBean<>(config.getName(), properties, topics, parallel, protoKafkaLogsSource));
                     consumerBean.start();
                 }
             }
