@@ -7,6 +7,9 @@ import io.opentelemetry.proto.common.v1.KeyValue;
 
 import java.util.List;
 
+/**
+ * @author dingjiefei
+ */
 public class OtlpUtil {
 
     public static JSONObject convertAttributesToJson(List<KeyValue> attributesList) {

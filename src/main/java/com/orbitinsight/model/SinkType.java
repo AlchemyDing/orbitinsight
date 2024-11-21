@@ -1,8 +1,11 @@
 package com.orbitinsight.model;
 
+import lombok.Getter;
+
 /**
  * @author dingjiefei
  */
+@Getter
 public enum SinkType {
     KAFKA(1),
     ;
@@ -13,7 +16,4 @@ public enum SinkType {
 
     private Integer type;
 
-    public Integer getType() {
-        return type;
-    }
 }
