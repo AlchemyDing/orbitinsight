@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.orbitinsight.core.bean.KafkaConsumerBean;
 import com.orbitinsight.core.bean.KafkaProducerBean;
+import com.orbitinsight.core.disruptor.DisruptorPublisher;
 import com.orbitinsight.domain.SinkConfig;
 import com.orbitinsight.domain.SinkFeature;
 import com.orbitinsight.domain.SourceConfig;
@@ -13,10 +14,10 @@ import com.orbitinsight.mapper.SourceConfigMapper;
 import com.orbitinsight.model.SignalType;
 import com.orbitinsight.model.SinkType;
 import com.orbitinsight.model.SourceType;
-import com.orbitinsight.pipeline.source.ProtoKafkaLogsSource;
 import com.orbitinsight.utils.BeanUtil;
 import com.orbitinsight.utils.CacheUtil;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.ByteArrayDeserializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -25,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.List;
 import java.util.Properties;
 
@@ -35,9 +37,6 @@ import java.util.Properties;
 public class OrbitInsightRunner implements CommandLineRunner {
 
     @Autowired
-    private ProtoKafkaLogsSource protoKafkaLogsSource;
-
-    @Autowired
     private SourceConfigMapper sourceConfigMapper;
 
     @Autowired
@@ -45,6 +44,9 @@ public class OrbitInsightRunner implements CommandLineRunner {
 
     @Autowired
     private SinkFeatureMapper sinkFeatureMapper;
+
+    @Resource(name = "protoKafkaLogsPublisher")
+    private DisruptorPublisher<ConsumerRecords> disruptorPublisher;
 
     @Override
     public void run(String... args) throws Exception {
@@ -105,7 +107,7 @@ public class OrbitInsightRunner implements CommandLineRunner {
                     properties.putIfAbsent(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ByteArrayDeserializer.class.getName());
                     Integer parallel = jsonObject.getInteger("parallel");
                     List<String> topics = jsonObject.getList("topics", String.class);
-                    KafkaConsumerBean<String, byte[]> consumerBean = (KafkaConsumerBean<String, byte[]>) BeanUtil.createBean(new KafkaConsumerBean<>(config.getName(), properties, topics, parallel, protoKafkaLogsSource));
+                    KafkaConsumerBean<String, byte[]> consumerBean = (KafkaConsumerBean<String, byte[]>) BeanUtil.createBean(new KafkaConsumerBean<>(config.getName(), properties, topics, parallel, disruptorPublisher));
                     consumerBean.start();
                 }
             }

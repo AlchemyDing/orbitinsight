@@ -43,4 +43,8 @@ public class BeanUtil {
         DefaultListableBeanFactory beanFactory = (DefaultListableBeanFactory) applicationContext.getBeanFactory();
         beanFactory.destroyBean(beanName);
     }
+
+    public static Object getBean(String beanName, Class clazz) {
+        return applicationContext.getBean(beanName, clazz);
+    }
 }

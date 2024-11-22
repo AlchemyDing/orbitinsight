@@ -1,35 +1,28 @@
-package com.orbitinsight.pipeline.channel;
+package com.orbitinsight.pipeline.processor;
 
 import com.alibaba.fastjson2.JSONObject;
-import com.google.common.collect.Lists;
-import com.google.protobuf.InvalidProtocolBufferException;
 import com.orbitinsight.cache.CachePool;
-import com.orbitinsight.core.pipeline.Channel;
+import com.orbitinsight.core.disruptor.DisruptorPublisher;
 import com.orbitinsight.model.LogInfo;
+import com.orbitinsight.pipeline.AbstractEventHandler;
 import com.orbitinsight.utils.OtlpUtil;
 import io.opentelemetry.proto.collector.logs.v1.ExportLogsServiceRequest;
 import io.opentelemetry.proto.logs.v1.LogRecord;
 import io.opentelemetry.proto.logs.v1.ResourceLogs;
 import io.opentelemetry.proto.logs.v1.ScopeLogs;
 import io.opentelemetry.proto.resource.v1.Resource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-/**
- * @author dingjiefei
- */
-@Component
-public class ProtoLogsDeserializerChannel extends Channel<List<byte[]>, List<LogInfo>> {
-
-    @Autowired
-    private LogsFliterChannel logsFliterChannel;
+public class ProtoLogsDeserializeProcessor extends AbstractEventHandler<List<byte[]>, List<LogInfo>> {
+    public ProtoLogsDeserializeProcessor(long ordinal, long numberOfConsumers) {
+        super(ordinal, numberOfConsumers);
+    }
 
     @Override
-    protected List<LogInfo> doExecute(List<byte[]> list) throws InvalidProtocolBufferException {
+    protected List<LogInfo> doExecute(List<byte[]> list) throws Exception {
         List<LogInfo> logInfos = new ArrayList<>();
         for (byte[] bytes : list) {
             ExportLogsServiceRequest request = ExportLogsServiceRequest.parseFrom(bytes);
@@ -74,14 +67,8 @@ public class ProtoLogsDeserializerChannel extends Channel<List<byte[]>, List<Log
         return logInfos;
     }
 
-
     @Override
-    public String getName() {
-        return getClass().getSimpleName();
-    }
-
-    @Override
-    public Collection<com.orbitinsight.core.pipeline.Component> getDownStreams() {
-        return Lists.newArrayList(logsFliterChannel);
+    public Collection<DisruptorPublisher<List<LogInfo>>> getDownStreams() {
+        return List.of();
     }
 }

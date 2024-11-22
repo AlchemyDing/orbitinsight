@@ -1,12 +1,11 @@
 package com.orbitinsight.pipeline.source;
 
 import com.google.common.collect.Lists;
-import com.orbitinsight.core.pipeline.Component;
-import com.orbitinsight.core.pipeline.Source;
-import com.orbitinsight.pipeline.channel.ProtoLogsDeserializerChannel;
+import com.orbitinsight.core.disruptor.DisruptorPublisher;
+import com.orbitinsight.pipeline.AbstractEventHandler;
+import com.orbitinsight.utils.BeanUtil;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,14 +14,14 @@ import java.util.List;
 /**
  * @author dingjiefei
  */
-@org.springframework.stereotype.Component
-public class ProtoKafkaLogsSource extends Source<ConsumerRecords<String, byte[]>, List<byte[]>> {
+public class ProtoKafkaLogsSource extends AbstractEventHandler<ConsumerRecords<String, byte[]>, List<byte[]>> {
+    public ProtoKafkaLogsSource(long ordinal, long numberOfConsumers) {
+        super(ordinal, numberOfConsumers);
+    }
 
-    @Autowired
-    private ProtoLogsDeserializerChannel protoLogsDeserializerChannel;
 
     @Override
-    protected List<byte[]> doExecute(ConsumerRecords<String, byte[]> records) {
+    protected List<byte[]> doExecute(ConsumerRecords<String, byte[]> records) throws Exception {
         List<byte[]> result = new ArrayList<>();
         for (ConsumerRecord<String, byte[]> record : records) {
             result.add(record.value());
@@ -31,12 +30,7 @@ public class ProtoKafkaLogsSource extends Source<ConsumerRecords<String, byte[]>
     }
 
     @Override
-    public String getName() {
-        return getClass().getSimpleName();
-    }
-
-    @Override
-    public Collection<Component> getDownStreams() {
-        return Lists.newArrayList(protoLogsDeserializerChannel);
+    public Collection<DisruptorPublisher<List<byte[]>>> getDownStreams() {
+        return Lists.newArrayList((DisruptorPublisher<List<byte[]>>) BeanUtil.getBean("protoLogsDeserializePublisher", DisruptorPublisher.class));
     }
 }

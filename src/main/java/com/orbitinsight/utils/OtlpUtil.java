@@ -1,11 +1,16 @@
 package com.orbitinsight.utils;
 
+import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.google.protobuf.ByteString;
+import com.googlecode.aviator.AviatorEvaluator;
+import com.googlecode.aviator.Expression;
 import io.opentelemetry.proto.common.v1.AnyValue;
 import io.opentelemetry.proto.common.v1.KeyValue;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author dingjiefei
@@ -62,5 +67,18 @@ public class OtlpUtil {
             hexString.append(HEX_CHARS[b & 0x0F]);
         }
         return hexString.toString();
+    }
+
+    public static void main(String[] args) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("serviceName", "sale-service");
+        exec(JSON.toJSONString(map));
+    }
+
+    private static void exec(String json) {
+        JSONObject jsonObject = JSON.parseObject(json);
+        Expression compile = AviatorEvaluator.compile("serviceName=='sale-service'");
+        compile.execute(jsonObject);
+        System.out.println();
     }
 }
