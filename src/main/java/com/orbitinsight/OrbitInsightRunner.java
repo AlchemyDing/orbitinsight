@@ -46,7 +46,7 @@ public class OrbitInsightRunner implements CommandLineRunner {
     private SinkFeatureMapper sinkFeatureMapper;
 
     @Resource(name = "protoKafkaLogsPublisher")
-    private DisruptorPublisher<ConsumerRecords> disruptorPublisher;
+    private DisruptorPublisher<ConsumerRecords<String, byte[]>> disruptorPublisher;
 
     @Override
     public void run(String... args) throws Exception {

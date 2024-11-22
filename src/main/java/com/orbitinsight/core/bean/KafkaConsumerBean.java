@@ -2,7 +2,6 @@ package com.orbitinsight.core.bean;
 
 import com.alibaba.fastjson2.JSON;
 import com.orbitinsight.core.disruptor.DisruptorPublisher;
-import com.orbitinsight.core.pipeline.Component;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.IterableUtils;
@@ -24,11 +23,11 @@ public class KafkaConsumerBean<K, V> extends AbstractManualBean {
     private final KafkaConsumer<K, V> consumer;
     private final List<String> topics;
     private final Integer parallel;
-    private final DisruptorPublisher<ConsumerRecords> disruptorPublisher;
+    private final DisruptorPublisher<ConsumerRecords<K, V>> disruptorPublisher;
 
     private final AtomicBoolean closed = new AtomicBoolean(false);
 
-    public KafkaConsumerBean(String beanName, Properties properties, List<String> topics, Integer parallel,DisruptorPublisher<ConsumerRecords> disruptorPublisher) {
+    public KafkaConsumerBean(String beanName, Properties properties, List<String> topics, Integer parallel, DisruptorPublisher<ConsumerRecords<K, V>> disruptorPublisher) {
         super(beanName);
         this.consumer = new KafkaConsumer<>(properties);
         this.topics = topics;
@@ -40,7 +39,7 @@ public class KafkaConsumerBean<K, V> extends AbstractManualBean {
         if (CollectionUtils.isEmpty(topics)) {
             throw new IllegalStateException("Topic list is empty");
         }
-        if (parallel < 1){
+        if (parallel < 1) {
             throw new IllegalStateException("Parallel must be greater than 0");
         }
         for (int i = 0; i < parallel; i++) {

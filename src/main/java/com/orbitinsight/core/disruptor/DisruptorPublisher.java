@@ -22,4 +22,8 @@ public class DisruptorPublisher<T> {
         RingBuffer<DisruptorEvent<T>> ringBuffer = disruptor.getRingBuffer();
         ringBuffer.publishEvent(translator, data);
     }
+
+    private void destroy() {
+        disruptor.shutdown();
+    }
 }
